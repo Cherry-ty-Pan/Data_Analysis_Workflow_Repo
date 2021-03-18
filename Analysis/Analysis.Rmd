@@ -9,11 +9,16 @@ source(file = "../Code/my_rf_cv.R")
 ```
 
 ```{r my_rf_cv}
+# Load packages required for the chunk
 library(dplyr)
 library(randomForest)
 library(ggplot2)
+# Load data from local Data folder
 my_penguins <- read.csv("../Data/my_penguins.csv")
-# run functions for 30 times with k = 2, 5, 10.
+# Predict `body_mass_g` using covariates `bill_length_mm`, `bill_depth_mm`, and 
+# `flipper_length_mm` with `my_knn_cv` function and iterate through k in c(2, 5, 10)  
+# for 30 iterations each.
+# Save the iteration results as `cv_2`, `cv_5` and `cv_10` respectively.
 cv_2 <- replicate(30, my_rf_cv(2))
 cv_5 <- replicate(30, my_rf_cv(5))
 cv_10 <- replicate(30, my_rf_cv(10))
@@ -28,13 +33,16 @@ cv_plot <- ggplot(cv_plot_df, aes(factor(k), cv)) +
   geom_boxplot() +
   labs(x = c("k"), y = c("CV estimated MSE"))
 cv_plot
-# Display table with 
+# Display the statistics of the results as a table
 cv_table <- data.frame("k" = c(2, 5, 10),
                        "Mean" = c(mean(cv_2),mean(cv_5),mean(cv_10)),
                        "Standard Deviation" = c(sd(cv_2),sd(cv_5),sd(cv_10)))
 cv_table
+# Save the `cv_plot` using `ggsave`
 ggsave("cv_plot", cv_plot, device = "png", path = "../Output/Figures")
+# Save simulation results as a csv using `write.csv`
 write.csv(cv_df, "../Output/Results/Simulations.csv")
+# Save statistics result table using `saveRDS`
 saveRDS(cv_table, "../Output/Results/summary_statistics")
                        
 ```
